@@ -83,7 +83,7 @@ export default function DataTable<TData, TValue>({
 
   useEffect(() => {
     onChange && onChange(table)
-  }, [rowSelection])
+  }, [rowSelection, table])
 
   useEffect(() => {
     if (filters) {

@@ -1,11 +1,11 @@
-import Header from "@/components/header/Header"; 
-import Sidebar from "@/components/sidebar/Sidebar";
-import { useState } from "react";
+'use client'
+
+import GoogleAuth from '@/components/googleLogin/GoogleLogin'
 
 export default function Home() {
   return (
     <main className=" ">
-      
+      <GoogleAuth></GoogleAuth>
     </main>
   )
 }
