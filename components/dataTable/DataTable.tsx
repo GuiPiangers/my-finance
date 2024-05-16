@@ -77,7 +77,6 @@ export default function DataTable<TData, TValue>({
     if (!deepCompare(columnFilters, prevValue.current)) {
       onChange && onChange(table)
     }
-    console.log(deepCompare(columnFilters, prevValue.current))
     prevValue.current = columnFilters
   }, [columnFilters])
 

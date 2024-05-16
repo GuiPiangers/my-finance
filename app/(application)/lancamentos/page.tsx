@@ -35,6 +35,7 @@ import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
 import NewLaunchDialog from '@/components/newLaunchDialog/NewLaunchDialog'
+import { test } from '@/server/User'
 
 const data = [
   {
@@ -124,6 +125,13 @@ export default function Launch() {
 
   return (
     <main className="py-10 px-6 space-y-4 w-full max-w-screen-xl mx-auto">
+      <Button
+        onClick={async () => {
+          test()
+        }}
+      >
+        Add cookie
+      </Button>
       <div className="flex gap-6 items-center mb-10">
         <h1 className="text-2xl">Lançamentos</h1>
 
