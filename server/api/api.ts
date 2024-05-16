@@ -55,7 +55,7 @@ export async function api<T>(
 
     if (!newToken) throw new Error('Falha de autenticação')
     const newData = await request(`${baseURL}${input}`, { ...init }, newToken)
-    cookieService.set('myFiance-token', newToken, { maxAge: 60 * 10 })
+    cookieService.set('myFinance-token', newToken, { maxAge: 60 * 10 })
 
     return await newData.json()
   }
