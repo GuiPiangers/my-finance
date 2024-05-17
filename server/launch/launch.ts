@@ -17,26 +17,39 @@ export type LaunchDTO = {
   value: number
 }
 
+export type CreateLaunch = {
+  date: string
+  description: string
+  type: typeEnum
+  status: statusEnum
+  category?: string
+  value: number
+}
+
 type UpdateLaunch = Partial<Omit<LaunchDTO, 'userId'>> & { id: string }
 
 const cookies = nextCookies()
 
-export const createLaunch = async (data: LaunchDTO) => {
-  await api(cookies, 'launch', {
+export const createLaunch = async (data: CreateLaunch) => {
+  const resp = await api(cookies, '/launch', {
     method: 'POST',
-    body: JSON.stringify({ data }),
+    body: JSON.stringify({ ...data }),
   })
+  return resp
 }
 
 export const listLaunches = async () => {
-  await api(cookies, '/launch', {
+  const launches = await api<LaunchDTO[]>(cookies, '/launch', {
     method: 'GET',
   })
+
+  return launches
 }
 export const getLaunch = async ({ launchId }: { launchId: string }) => {
-  await api(cookies, `/launch/${launchId}`, {
+  const launch = await api<LaunchDTO>(cookies, `/launch/${launchId}`, {
     method: 'GET',
   })
+  return launch
 }
 export const deleteLaunch = async ({ launchId }: { launchId: string }) => {
   await api(cookies, `/launch`, {
@@ -46,8 +59,8 @@ export const deleteLaunch = async ({ launchId }: { launchId: string }) => {
 }
 
 export const updateLaunch = async ({ id, ...data }: UpdateLaunch) => {
-  await api(cookies, `launch/${id}`, {
+  await api(cookies, `/launch/${id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ data }),
+    body: JSON.stringify({ ...data }),
   })
 }

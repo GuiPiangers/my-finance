@@ -27,7 +27,7 @@ export async function api<T>(
   cookieService: ReadonlyRequestCookies,
   input: RequestInfo,
   init?: RequestInit | undefined,
-): Promise<T | responseError> {
+): Promise<T> {
   const baseURL = 'http://localhost:3333'
 
   const token = cookieService.get('myFinance-token')

@@ -35,7 +35,7 @@ import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
 import NewLaunchDialog from '@/components/newLaunchDialog/NewLaunchDialog'
-import { test } from '@/server/User'
+import { createLaunch } from '@/server/launch/launch'
 
 const data = [
   {
@@ -127,7 +127,14 @@ export default function Launch() {
     <main className="py-10 px-6 space-y-4 w-full max-w-screen-xl mx-auto">
       <Button
         onClick={async () => {
-          test()
+          const resp = await createLaunch({
+            date: '12/04/2024',
+            description: 'desci',
+            status: 'payable',
+            type: 'revenue',
+            value: 20000,
+          })
+          console.log(resp)
         }}
       >
         Add cookie
