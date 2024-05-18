@@ -34,7 +34,13 @@ import { Row } from '@tanstack/react-table'
 import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
-import { LaunchDTO } from '@/server/launch/launch'
+import {
+  LaunchDTO,
+  createLaunch,
+  listLaunches,
+  statusEnum,
+  typeEnum,
+} from '@/server/launch/launch'
 
 export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
   console.log(data)
@@ -87,8 +93,26 @@ export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
   ) => {
     if (e.currentTarget.value === status) setStatus('')
   }
+
   return (
     <>
+      <Button
+        onClick={async () => {
+          const newDataLaunch = {
+            date: '12/04/2024',
+            description: 'Aluguel',
+            value: 850,
+            category: 'Contas',
+            type: 'expenditure' as typeEnum,
+            status: 'payable' as statusEnum,
+          }
+          await createLaunch(newDataLaunch)
+          const launches = await listLaunches()
+          console.log(launches)
+        }}
+      >
+        Teste
+      </Button>
       <div className="grid sm:grid-cols-3 grid-cols-2 gap-4 max-w-xl">
         <ResultCard
           title="Total"

@@ -25,7 +25,7 @@ const cookies = nextCookies()
 export const createLaunch = async (data: CreateLaunch) => {
   const resp = await api(cookies, '/launch', {
     method: 'POST',
-    body: JSON.stringify({ ...data }),
+    body: JSON.stringify(data),
   })
   return resp
 }
@@ -33,6 +33,7 @@ export const createLaunch = async (data: CreateLaunch) => {
 export const listLaunches = async () => {
   const launches = await api<LaunchDTO[]>(cookies, '/launch', {
     method: 'GET',
+    cache: 'no-store',
   })
 
   return launches
@@ -53,6 +54,6 @@ export const deleteLaunch = async ({ launchId }: { launchId: string }) => {
 export const updateLaunch = async ({ id, ...data }: UpdateLaunch) => {
   await api(cookies, `/launch/${id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ ...data }),
+    body: JSON.stringify(data),
   })
 }

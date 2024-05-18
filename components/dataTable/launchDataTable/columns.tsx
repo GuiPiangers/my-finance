@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils'
 import MoneyNumber from '../../moneyNumber/MoneyNumber'
 
 export const LaunchDataSchema = z.object({
-  id: z.string(),
   date: z.string(),
   description: z.string(),
   category: z.string().optional(),

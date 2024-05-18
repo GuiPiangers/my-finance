@@ -1,23 +1,14 @@
 /* eslint-disable no-useless-constructor */
-// 'use server'
 
-// import { cookies } from 'next/headers'
-// import { api } from './api/api'
+import { createLaunch, statusEnum, typeEnum } from './launch/launch'
 
-// export const test = async () => {
-//   const handleCookie = cookies()
-//   await api(handleCookie, '/launch', {
-//     method: 'POST',
-//     body: JSON.stringify({
-//       date: '24/04/2024',
-//       description: 'Salário MQB',
-//       value: 2000,
-//       type: 'revenue',
-//       status: 'payed',
-//     }),
-//   })
-//   const listLaunches = await api(handleCookie, '/launch', {
-//     method: 'GET',
-//   })
-//   // console.log(listLaunches)
-// }
+export const test = async () => {
+  const newDataLaunch = {
+    date: '24/04/2024',
+    description: 'Salário MQB',
+    value: 2000,
+    type: 'revenue' as typeEnum,
+    status: 'payed' as statusEnum,
+  }
+  await createLaunch(newDataLaunch)
+}
