@@ -7,10 +7,11 @@ import { Checkbox } from '../../ui/checkbox'
 import { cn } from '@/lib/utils'
 import MoneyNumber from '../../moneyNumber/MoneyNumber'
 
-const LaunchDataSchema = z.object({
+export const LaunchDataSchema = z.object({
+  id: z.string(),
   date: z.string(),
   description: z.string(),
-  category: z.string(),
+  category: z.string().optional(),
   value: z.number(),
   type: z.enum(['revenue', 'expenditure']),
   status: z.enum(['payed', 'payable']),

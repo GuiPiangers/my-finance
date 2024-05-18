@@ -3,12 +3,11 @@
 import { cookies as nextCookies } from 'next/headers'
 import { api } from '../api/api'
 
-type typeEnum = 'revenue' | 'expenditure'
-type statusEnum = 'payed' | 'payable'
+export type typeEnum = 'revenue' | 'expenditure'
+export type statusEnum = 'payed' | 'payable'
 
 export type LaunchDTO = {
-  id?: string
-  userId: string
+  id: string
   date: string
   description: string
   type: typeEnum
@@ -17,16 +16,9 @@ export type LaunchDTO = {
   value: number
 }
 
-export type CreateLaunch = {
-  date: string
-  description: string
-  type: typeEnum
-  status: statusEnum
-  category?: string
-  value: number
-}
+export type CreateLaunch = Omit<LaunchDTO, 'id'>
 
-type UpdateLaunch = Partial<Omit<LaunchDTO, 'userId'>> & { id: string }
+type UpdateLaunch = LaunchDTO
 
 const cookies = nextCookies()
 
