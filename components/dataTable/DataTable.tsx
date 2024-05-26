@@ -11,6 +11,7 @@ import {
   getFilteredRowModel,
   ColumnFiltersState,
   Table as TanTable,
+  Row,
 } from '@tanstack/react-table'
 
 import {
@@ -21,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useEffect, useRef, useState } from 'react'
+import { MouseEvent, useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from '@/hooks/UseMediaQuery'
 import { deepCompare } from '@/utils/deepCompare'
 
@@ -35,6 +36,10 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   filters?: Filter<TData>[]
   onChange?: (table: TanTable<TData>) => void
+  onRowClick?: (
+    row: Row<TData>,
+    event: MouseEvent<HTMLTableRowElement, globalThis.MouseEvent>,
+  ) => void
 }
 
 export type handleTable<TData> = {
@@ -46,6 +51,7 @@ export default function DataTable<TData, TValue>({
   data,
   filters,
   onChange,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const isLargeScreen = useMediaQuery('(min-width: 768px)')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -129,19 +135,27 @@ export default function DataTable<TData, TValue>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-                className="relative"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="px-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            table.getRowModel().rows.map((row) => {
+              return (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="relative"
+                  onClick={(e) => {
+                    onRowClick && onRowClick(row, e)
+                  }}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="px-2">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">

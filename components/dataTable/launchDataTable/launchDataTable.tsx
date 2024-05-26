@@ -3,10 +3,7 @@
 
 import { IoIosArrowForward, IoIosClose } from 'react-icons/io'
 import { IoFilter } from 'react-icons/io5'
-import {
-  columns,
-  LaunchData,
-} from '@/components/dataTable/launchDataTable/columns'
+import { columns } from '@/components/dataTable/launchDataTable/columns'
 import DataTable, { Filter } from '@/components/dataTable/DataTable'
 import ResultCard from '@/components/ResultCard/ResultCard'
 import { Button } from '@/components/ui/button'
@@ -30,25 +27,22 @@ import MoneyNumber from '@/components/moneyNumber/MoneyNumber'
 import { cn } from '@/lib/utils'
 import DateController from '@/components/dateController/DateController'
 import { Row } from '@tanstack/react-table'
+import LaunchInfoDialog from '@/components/launch/launchInfoDialog/LaunchInfoDialog'
+import { LaunchData } from '@/server/launch/launchSchema'
 
 import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
-import {
-  LaunchDTO,
-  createLaunch,
-  listLaunches,
-  statusEnum,
-  typeEnum,
-} from '@/server/launch/launch'
+import { deleteLaunch } from '@/server/launch/launch'
 
-export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
-  console.log(data)
+export function LaunchDataTable({ data }: { data: LaunchData[] }) {
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
   const [category, setCategory] = useState<string[]>([])
 
   const [selectedRows, setSelectedRows] = useState<Row<LaunchData>[]>([])
+  const [clickedLaunch, setClickedLaunch] = useState<LaunchData>()
+  const [dialogLaunchOpen, setDialogLaunchOpen] = useState(false)
 
   const selectedSum = selectedRows.reduce((acc, row) => {
     return acc + (row.getValue('value') as number)
@@ -60,6 +54,8 @@ export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
     { field: 'category', value: category },
     { field: 'status', value: status },
   ]
+
+  if (!data) return
 
   const totalRevenue = data.reduce((acc, field) => {
     if (field.type === 'revenue' && field.status === 'payed')
@@ -96,23 +92,6 @@ export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
 
   return (
     <>
-      <Button
-        onClick={async () => {
-          const newDataLaunch = {
-            date: '12/04/2024',
-            description: 'Aluguel',
-            value: 850,
-            category: 'Contas',
-            type: 'expenditure' as typeEnum,
-            status: 'payable' as statusEnum,
-          }
-          await createLaunch(newDataLaunch)
-          const launches = await listLaunches()
-          console.log(launches)
-        }}
-      >
-        Teste
-      </Button>
       <div className="grid sm:grid-cols-3 grid-cols-2 gap-4 max-w-xl">
         <ResultCard
           title="Total"
@@ -337,6 +316,12 @@ export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
               size={'sm'}
               variant={'outline'}
               className="border-red-300 text-red-500 hover:bg-red-50"
+              onClick={async () => {
+                const deleteRows = selectedRows.map((row) => {
+                  return deleteLaunch({ launchId: row.original.id })
+                })
+                await Promise.all(deleteRows)
+              }}
             >
               Excluir
             </Button>
@@ -354,14 +339,27 @@ export function LaunchDataTable({ data }: { data: LaunchDTO[] }) {
             </span>
           </div>
         </div>
-        <DataTable
-          columns={columns}
-          data={data}
-          filters={filters}
-          onChange={(table) => {
-            setSelectedRows(table.getFilteredSelectedRowModel().rows)
-          }}
-        />
+        <LaunchInfoDialog
+          data={clickedLaunch}
+          open={dialogLaunchOpen}
+          onOpenChange={(openValue) => setDialogLaunchOpen(openValue)}
+        >
+          <DataTable
+            columns={columns}
+            data={data}
+            filters={filters}
+            onChange={(table) => {
+              setSelectedRows(table.getFilteredSelectedRowModel().rows)
+            }}
+            onRowClick={(row, event) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              if ((event.target as unknown as any).hasAttribute('aria-checked'))
+                return
+              setClickedLaunch(row.original)
+              setDialogLaunchOpen(true)
+            }}
+          />
+        </LaunchInfoDialog>
       </div>
     </>
   )

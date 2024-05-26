@@ -9,12 +9,9 @@ export default function GoogleAuth() {
       onSuccess={async (credentialResponse) => {
         const { credential } = credentialResponse
         if (!credential) return
-        const authData = await loginWithGoogle({ token: credential })
-        console.log(authData)
+        await loginWithGoogle({ token: credential })
       }}
-      onError={() => {
-        console.log('Login Failed')
-      }}
+      onError={() => {}}
     />
   )
 }

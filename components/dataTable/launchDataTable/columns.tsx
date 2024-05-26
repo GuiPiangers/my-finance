@@ -1,33 +1,13 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { z } from 'zod'
+
 import Sort from '../Sort'
 import { Checkbox } from '../../ui/checkbox'
 import { cn } from '@/lib/utils'
 import MoneyNumber from '../../moneyNumber/MoneyNumber'
-
-export const LaunchDataSchema = z.object({
-  date: z.string(),
-  description: z.string(),
-  category: z.string().optional(),
-  value: z.number(),
-  type: z.enum(['revenue', 'expenditure']),
-  status: z.enum(['payed', 'payable']),
-})
-
-const statusText = {
-  revenue: {
-    payed: 'Recebido',
-    payable: 'A receber',
-  },
-  expenditure: {
-    payed: 'Pago',
-    payable: 'A pagar',
-  },
-}
-
-export type LaunchData = z.infer<typeof LaunchDataSchema>
+import { statusText } from '@/model/launch/statusText'
+import { LaunchData } from '@/server/launch/launchSchema'
 
 export const columns: ColumnDef<LaunchData>[] = [
   {

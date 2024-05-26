@@ -1,29 +1,10 @@
 'use server'
 
-import { cookies as nextCookies } from 'next/headers'
 import { api } from '../api/api'
-
-export type typeEnum = 'revenue' | 'expenditure'
-export type statusEnum = 'payed' | 'payable'
-
-export type LaunchDTO = {
-  id: string
-  date: string
-  description: string
-  type: typeEnum
-  status: statusEnum
-  category?: string
-  value: number
-}
-
-export type CreateLaunch = Omit<LaunchDTO, 'id'>
-
-type UpdateLaunch = LaunchDTO
-
-const cookies = nextCookies()
+import { CreateLaunch, LaunchData } from './launchSchema'
 
 export const createLaunch = async (data: CreateLaunch) => {
-  const resp = await api(cookies, '/launch', {
+  const resp = await api('/launch', {
     method: 'POST',
     body: JSON.stringify(data),
   })
@@ -31,7 +12,7 @@ export const createLaunch = async (data: CreateLaunch) => {
 }
 
 export const listLaunches = async () => {
-  const launches = await api<LaunchDTO[]>(cookies, '/launch', {
+  const launches = await api<LaunchData[]>('/launch', {
     method: 'GET',
     cache: 'no-store',
   })
@@ -39,20 +20,20 @@ export const listLaunches = async () => {
   return launches
 }
 export const getLaunch = async ({ launchId }: { launchId: string }) => {
-  const launch = await api<LaunchDTO>(cookies, `/launch/${launchId}`, {
+  const launch = await api<LaunchData>(`/launch/${launchId}`, {
     method: 'GET',
+    cache: 'no-store',
   })
   return launch
 }
 export const deleteLaunch = async ({ launchId }: { launchId: string }) => {
-  await api(cookies, `/launch`, {
+  await api(`/launch/${launchId}`, {
     method: 'DELETE',
-    body: JSON.stringify({ id: launchId }),
   })
 }
 
-export const updateLaunch = async ({ id, ...data }: UpdateLaunch) => {
-  await api(cookies, `/launch/${id}`, {
+export const updateLaunch = async ({ id, ...data }: LaunchData) => {
+  await api(`/launch/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
   })
