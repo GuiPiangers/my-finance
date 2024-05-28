@@ -40,7 +40,6 @@ export function GenerateLaunchForm({
       ? moneyFormatter(initialLaunchData.value)
       : 'R$ 0,00',
   )
-  console.log(initialLaunchData?.id)
 
   const form = useForm<LaunchData>({
     resolver: zodResolver(LaunchDataSchema),

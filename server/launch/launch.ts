@@ -1,5 +1,6 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { api } from '../api/api'
 import { CreateLaunch, LaunchData } from './launchSchema'
 
@@ -12,6 +13,9 @@ export const createLaunch = async (data: CreateLaunch) => {
 }
 
 export const listLaunches = async () => {
+  console.log(
+    'Mensagem de ServerAction ' + cookies().get('myFinance-token')?.value,
+  )
   const launches = await api<LaunchData[]>('/launch', {
     method: 'GET',
     cache: 'no-store',

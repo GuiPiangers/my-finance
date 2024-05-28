@@ -59,8 +59,7 @@ export default function UpdateLaunchDialog({
             value,
           }}
           onSubmit={async (data: LaunchData) => {
-            console.log(data)
-            await updateLaunch({ ...data })
+            await updateLaunch(data)
             router.refresh()
           }}
           footerButtons={
