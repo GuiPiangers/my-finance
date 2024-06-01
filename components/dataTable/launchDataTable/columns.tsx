@@ -55,6 +55,7 @@ export const columns: ColumnDef<LaunchData>[] = [
   {
     accessorKey: 'date',
     header: (props) => Sort({ text: 'Data', ...props }),
+    cell: ({ row }) => new Date(row.getValue('date')).toLocaleDateString(),
   },
   {
     accessorKey: 'description',

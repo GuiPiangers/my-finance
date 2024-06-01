@@ -17,9 +17,19 @@ import { GenerateLaunchForm } from '../generateLaunchForm/generateLaunchForm'
 import { createLaunch } from '@/server/launch/launch'
 import { LaunchData } from '@/server/launch/launchSchema'
 import { useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function NewLaunchDialog() {
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async (data: LaunchData) => {
+      await createLaunch(data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listLaunches'] })
+    },
+  })
   const [tab, setTab] = useState<'expenditure' | 'revenue' | 'transfer'>(
     'expenditure',
   )
@@ -66,10 +76,7 @@ export default function NewLaunchDialog() {
                 status: 'payable',
                 date: new Date().toISOString().substring(0, 10),
               }}
-              onSubmit={async (data: LaunchData) => {
-                await createLaunch(data)
-                router.refresh()
-              }}
+              onSubmit={async (values) => await mutation.mutate(values)}
               footerButtons={
                 <DialogFooter className="border-t pt-4 px-0 mt-6">
                   <DialogClose asChild>

@@ -23,7 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { MouseEvent, useEffect, useRef, useState } from 'react'
-import { useMediaQuery } from '@/hooks/UseMediaQuery'
+// import { useMediaQuery } from '@/hooks/UseMediaQuery'
 import { deepCompare } from '@/utils/deepCompare'
 
 export type Filter<TData> = {
@@ -53,7 +53,6 @@ export default function DataTable<TData, TValue>({
   onChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
-  const isLargeScreen = useMediaQuery('(min-width: 768px)')
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -88,7 +87,7 @@ export default function DataTable<TData, TValue>({
 
   useEffect(() => {
     onChange && onChange(table)
-  }, [rowSelection, table])
+  }, [onChange, rowSelection, table])
 
   useEffect(() => {
     if (filters) {
@@ -97,16 +96,6 @@ export default function DataTable<TData, TValue>({
       })
     }
   }, [filters, table])
-
-  useEffect(() => {
-    if (!isLargeScreen) {
-      table.getColumn('category')?.toggleVisibility(false)
-      table.getColumn('description')?.toggleVisibility(false)
-    } else {
-      table.getColumn('category')?.toggleVisibility(true)
-      table.getColumn('description')?.toggleVisibility(true)
-    }
-  }, [isLargeScreen, table])
 
   return (
     <div className="">

@@ -19,9 +19,7 @@ export default async function middleware(request: NextRequest) {
     }
     response.cookies.set('myFinance-token', newToken, { maxAge: 60 * 15 })
   }
-  console.log(
-    'mensagem middleware ' + response.cookies.get('myFinance-token')?.value,
-  )
+
   return response
 }
 

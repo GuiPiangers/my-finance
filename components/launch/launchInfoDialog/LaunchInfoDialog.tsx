@@ -1,3 +1,5 @@
+'use client'
+
 import { ReactNode } from 'react'
 import {
   Dialog,
@@ -11,10 +13,12 @@ import { Switch } from '../../ui/switch'
 import { Label } from '../../ui/label'
 import UpdateLaunchDialog from '../updateLaunchDialog/updateLaunchDialog'
 import { DialogProps } from '@radix-ui/react-dialog'
+import { updateLaunch } from '@/server/launch/launch'
+import { useRouter } from 'next/navigation'
 
 type LaunchInfoDialogProps = {
   children: ReactNode
-  data?: LaunchData
+  data: LaunchData
 } & DialogProps
 
 export default function LaunchInfoDialog({
@@ -22,22 +26,35 @@ export default function LaunchInfoDialog({
   data: launchData,
   ...dialogProps
 }: LaunchInfoDialogProps) {
+  const router = useRouter()
   return (
     <>
       <Dialog {...dialogProps}>
         {children}
-        <DialogContent className="max-w-80 rounded-lg ">
-          <DialogHeader className="items-center">
-            <DialogTitle>{launchData?.description}</DialogTitle>
+        <DialogContent className=" max-w-80 rounded-lg ">
+          <DialogHeader className="">
+            <DialogTitle className="text-xl">
+              {launchData?.description}
+            </DialogTitle>
             <strong
               data-type={launchData?.type}
-              className="text-2xl data-[type='revenue']:text-green-600 data-[type='expenditure']:text-red-600"
+              className="text-lg data-[type='revenue']:text-green-600 data-[type='expenditure']:text-red-600"
             >
               {launchData && <MoneyNumber number={launchData.value} />}
             </strong>
           </DialogHeader>
           <div className="flex flex-row-reverse justify-between">
-            <Switch id="swt-status" />
+            <Switch
+              id="swt-status"
+              defaultChecked={launchData?.status === 'payed'}
+              onCheckedChange={async (value) => {
+                await updateLaunch({
+                  id: launchData.id!,
+                  status: value ? 'payed' : 'payable',
+                })
+                router.refresh()
+              }}
+            />
             <Label
               htmlFor="swt-status"
               className="flex-1 w-full text-yellow-200 peer-aria-checked:text-blue-200"

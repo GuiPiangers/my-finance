@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
+import QueryClientContext from '@/contexts/QueryClientProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt">
-      <body className={cn(inter.className, 'bg-slate-50')}>{children}</body>
+      <body className={cn(inter.className, 'bg-slate-50')}>
+        <QueryClientContext>{children}</QueryClientContext>
+      </body>
     </html>
   )
 }

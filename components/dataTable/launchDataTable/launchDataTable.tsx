@@ -33,9 +33,19 @@ import { LaunchData } from '@/server/launch/launchSchema'
 import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
-import { deleteLaunch } from '@/server/launch/launch'
+import { deleteLaunch, listLaunches } from '@/server/launch/launch'
+import { useMediaQuery } from '@/hooks/UseMediaQuery'
+import { useQuery } from '@tanstack/react-query'
 
 export function LaunchDataTable({ data }: { data: LaunchData[] }) {
+  const { data: launches } = useQuery({
+    queryKey: ['listLaunches'],
+    queryFn: async () => await listLaunches(),
+    initialData: data,
+    staleTime: 1000 * 60 * 3, // 3 minutes
+  })
+
+  const isLargeScreen = useMediaQuery('(min-width: 768px)')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
   const [category, setCategory] = useState<string[]>([])
@@ -55,24 +65,24 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
     { field: 'status', value: status },
   ]
 
-  if (!data) return
+  if (!launches) return
 
-  const totalRevenue = data.reduce((acc, field) => {
+  const totalRevenue = launches.reduce((acc, field) => {
     if (field.type === 'revenue' && field.status === 'payed')
       return acc + field.value
     return acc
   }, 0)
-  const totalExpenditure = data.reduce((acc, field) => {
+  const totalExpenditure = launches.reduce((acc, field) => {
     if (field.type === 'expenditure' && field.status === 'payed')
       return acc + field.value
     return acc
   }, 0)
-  const revenueToGet = data.reduce((acc, field) => {
+  const revenueToGet = launches.reduce((acc, field) => {
     if (field.type === 'revenue' && field.status === 'payable')
       return acc + field.value
     return acc
   }, 0)
-  const expenditureToPay = data.reduce((acc, field) => {
+  const expenditureToPay = launches.reduce((acc, field) => {
     if (field.type === 'expenditure' && field.status === 'payable')
       return acc + field.value
     return acc
@@ -235,8 +245,8 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
 
               <CollapsibleContent>
                 <Separator />
-                {data.length > 0 &&
-                  data
+                {launches.length > 0 &&
+                  launches
                     .reduce((acc, launch) => {
                       if (launch.category && !acc.includes(launch.category)) {
                         acc.push(launch.category)
@@ -340,20 +350,29 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
           </div>
         </div>
         <LaunchInfoDialog
-          data={clickedLaunch}
+          data={clickedLaunch!}
           open={dialogLaunchOpen}
           onOpenChange={(openValue) => setDialogLaunchOpen(openValue)}
         >
           <DataTable
             columns={columns}
-            data={data}
+            data={launches}
             filters={filters}
             onChange={(table) => {
               setSelectedRows(table.getFilteredSelectedRowModel().rows)
+              if (!isLargeScreen) {
+                table.getColumn('category')?.toggleVisibility(false)
+                table.getColumn('description')?.toggleVisibility(false)
+              } else {
+                table.getColumn('category')?.toggleVisibility(true)
+                table.getColumn('description')?.toggleVisibility(true)
+              }
             }}
             onRowClick={(row, event) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              if ((event.target as unknown as any).hasAttribute('aria-checked'))
+              if (
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (event.target as unknown as any).hasAttribute('aria-checked')
+              )
                 return
               setClickedLaunch(row.original)
               setDialogLaunchOpen(true)

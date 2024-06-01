@@ -1,6 +1,5 @@
 'use server'
 
-import { cookies } from 'next/headers'
 import { api } from '../api/api'
 import { CreateLaunch, LaunchData } from './launchSchema'
 
@@ -13,9 +12,7 @@ export const createLaunch = async (data: CreateLaunch) => {
 }
 
 export const listLaunches = async () => {
-  console.log(
-    'Mensagem de ServerAction ' + cookies().get('myFinance-token')?.value,
-  )
+  console.log('Chamou listLaunches')
   const launches = await api<LaunchData[]>('/launch', {
     method: 'GET',
     cache: 'no-store',
@@ -26,7 +23,6 @@ export const listLaunches = async () => {
 export const getLaunch = async ({ launchId }: { launchId: string }) => {
   const launch = await api<LaunchData>(`/launch/${launchId}`, {
     method: 'GET',
-    cache: 'no-store',
   })
   return launch
 }
@@ -36,7 +32,7 @@ export const deleteLaunch = async ({ launchId }: { launchId: string }) => {
   })
 }
 
-export const updateLaunch = async ({ id, ...data }: LaunchData) => {
+export const updateLaunch = async ({ id, ...data }: Partial<LaunchData>) => {
   await api(`/launch/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),

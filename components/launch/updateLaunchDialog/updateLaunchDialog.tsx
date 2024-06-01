@@ -15,7 +15,7 @@ import { GenerateLaunchForm } from '../generateLaunchForm/generateLaunchForm'
 import { updateLaunch } from '@/server/launch/launch'
 import { LaunchData } from '@/server/launch/launchSchema'
 
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 
 type UpdateLaunchDialogProps = {
   initialData: Partial<LaunchData>
@@ -24,7 +24,7 @@ type UpdateLaunchDialogProps = {
 export default function UpdateLaunchDialog({
   initialData,
 }: UpdateLaunchDialogProps) {
-  const router = useRouter()
+  // const router = useRouter()
   const { type, category, date, description, id, status, value } = initialData
 
   const HeaderText = {
@@ -60,7 +60,6 @@ export default function UpdateLaunchDialog({
           }}
           onSubmit={async (data: LaunchData) => {
             await updateLaunch(data)
-            router.refresh()
           }}
           footerButtons={
             <DialogFooter className="border-t pt-4 px-0 mt-6">
