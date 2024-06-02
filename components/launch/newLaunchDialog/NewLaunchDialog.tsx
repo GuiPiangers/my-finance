@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../../ui/button'
 import {
   Dialog,
@@ -9,30 +9,50 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from '../../ui/dialog'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs'
-import { GenerateLaunchForm } from '../generateLaunchForm/generateLaunchForm'
-import { createLaunch } from '@/server/launch/launch'
-import { LaunchData } from '@/server/launch/launchSchema'
-import { useRouter } from 'next/navigation'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { LaunchForm } from '../launchForm/launchForm'
+import { useCreateLaunch } from '@/hooks/useCreateLaunch'
+import { typeEnum } from '@/server/launch/launchSchema'
+
+type NewLaunchFormProps = { type: typeEnum; onSuccess?(): void }
+
+const NewLaunchForm = ({ type, onSuccess }: NewLaunchFormProps) => {
+  const createLaunch = useCreateLaunch()
+
+  useEffect(() => {
+    if (onSuccess && createLaunch.isSuccess) onSuccess()
+  }, [onSuccess, createLaunch.isSuccess])
+
+  return (
+    <LaunchForm
+      initialLaunchData={{
+        type,
+        status: 'payable',
+        date: new Date().toISOString().substring(0, 10),
+      }}
+      onSubmit={async (values) => {
+        createLaunch.mutate(values)
+      }}
+      footerButtons={
+        <DialogFooter className="border-t pt-4 px-0 mt-6">
+          <div>
+            <Button variant={'create'} className="w-40">
+              Salvar
+            </Button>
+          </div>
+        </DialogFooter>
+      }
+    />
+  )
+}
 
 export default function NewLaunchDialog() {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn: async (data: LaunchData) => {
-      await createLaunch(data)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listLaunches'] })
-    },
-  })
   const [tab, setTab] = useState<'expenditure' | 'revenue' | 'transfer'>(
     'expenditure',
   )
+  const [dialogOpen, setDialogOpen] = useState(false)
   const HeaderText = {
     expenditure: (
       <DialogTitle className="text-red-600">Nova despesa</DialogTitle>
@@ -42,9 +62,16 @@ export default function NewLaunchDialog() {
       <DialogTitle className="text-purple-600">Nova transferência</DialogTitle>
     ),
   }
+  console.log(tab)
 
   return (
-    <Dialog>
+    <Dialog
+      open={dialogOpen}
+      onOpenChange={(isOpen) => {
+        setDialogOpen(isOpen)
+        if (isOpen) setTab('expenditure')
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant={'create'} size={'sm'}>
           Adicionar
@@ -70,44 +97,19 @@ export default function NewLaunchDialog() {
           </TabsList>
 
           <TabsContent value="expenditure">
-            <GenerateLaunchForm
-              initialLaunchData={{
-                type: 'expenditure',
-                status: 'payable',
-                date: new Date().toISOString().substring(0, 10),
+            <NewLaunchForm
+              type="expenditure"
+              onSuccess={() => {
+                setDialogOpen(false)
               }}
-              onSubmit={async (values) => await mutation.mutate(values)}
-              footerButtons={
-                <DialogFooter className="border-t pt-4 px-0 mt-6">
-                  <DialogClose asChild>
-                    <div>
-                      <Button variant={'create'} className="w-40">
-                        Salvar
-                      </Button>
-                    </div>
-                  </DialogClose>
-                </DialogFooter>
-              }
             />
           </TabsContent>
           <TabsContent value="revenue">
-            <GenerateLaunchForm
-              initialLaunchData={{ type: 'revenue', status: 'payable' }}
-              onSubmit={async (data: LaunchData) => {
-                await createLaunch(data)
-                router.refresh()
+            <NewLaunchForm
+              type="revenue"
+              onSuccess={() => {
+                setDialogOpen(false)
               }}
-              footerButtons={
-                <DialogFooter className="border-t pt-4 px-0 mt-6">
-                  <DialogClose asChild>
-                    <div>
-                      <Button variant={'create'} className="w-40">
-                        Salvar
-                      </Button>
-                    </div>
-                  </DialogClose>
-                </DialogFooter>
-              }
             />
           </TabsContent>
         </Tabs>

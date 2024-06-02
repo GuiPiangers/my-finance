@@ -1,9 +1,14 @@
 'use server'
 
 import { api } from '../api/api'
-import { CreateLaunch, LaunchData } from './launchSchema'
+import {
+  ChangeLaunchStatusData,
+  CreateLaunchData,
+  LaunchData,
+  UpdateLaunchData,
+} from './launchSchema'
 
-export const createLaunch = async (data: CreateLaunch) => {
+export const createLaunch = async (data: CreateLaunchData) => {
   const resp = await api('/launch', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -12,7 +17,6 @@ export const createLaunch = async (data: CreateLaunch) => {
 }
 
 export const listLaunches = async () => {
-  console.log('Chamou listLaunches')
   const launches = await api<LaunchData[]>('/launch', {
     method: 'GET',
     cache: 'no-store',
@@ -32,9 +36,20 @@ export const deleteLaunch = async ({ launchId }: { launchId: string }) => {
   })
 }
 
-export const updateLaunch = async ({ id, ...data }: Partial<LaunchData>) => {
+export const updateLaunch = async ({ id, ...data }: UpdateLaunchData) => {
   await api(`/launch/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
+  })
+}
+export const changeLaunchStatus = async ({
+  id,
+  status,
+}: ChangeLaunchStatusData) => {
+  await api(`/launch/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      status: status ? 'payed' : 'payable',
+    }),
   })
 }

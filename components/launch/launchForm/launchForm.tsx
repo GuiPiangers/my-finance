@@ -24,17 +24,17 @@ import { Label } from '../../ui/label'
 import { ReactNode, useState } from 'react'
 import { moneyFormatter } from '@/utils/moneyFormatter'
 
-type GenerateLaunchFormProps = {
+type LaunchFormProps = {
   footerButtons: ReactNode
   onSubmit: (values: LaunchData) => Promise<void>
   initialLaunchData?: Partial<LaunchData>
 }
 
-export function GenerateLaunchForm({
+export function LaunchForm({
   footerButtons,
   onSubmit,
   initialLaunchData,
-}: GenerateLaunchFormProps) {
+}: LaunchFormProps) {
   const [value, setValue] = useState(
     initialLaunchData?.value
       ? moneyFormatter(initialLaunchData.value)

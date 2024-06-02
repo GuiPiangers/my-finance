@@ -2,7 +2,6 @@
 
 import { LaunchDataTable } from '@/components/dataTable/launchDataTable/launchDataTable'
 import NewLaunchDialog from '@/components/launch/newLaunchDialog/NewLaunchDialog'
-// import { Button } from '@/components/ui/button'
 import { listLaunches } from '@/server/launch/launch'
 
 export default async function Launch() {

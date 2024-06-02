@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import MoneyNumber from '../../moneyNumber/MoneyNumber'
 import { statusText } from '@/model/launch/statusText'
 import { LaunchData } from '@/server/launch/launchSchema'
+import { dateFormatter } from '@/utils/Date'
 
 export const columns: ColumnDef<LaunchData>[] = [
   {
@@ -55,7 +56,7 @@ export const columns: ColumnDef<LaunchData>[] = [
   {
     accessorKey: 'date',
     header: (props) => Sort({ text: 'Data', ...props }),
-    cell: ({ row }) => new Date(row.getValue('date')).toLocaleDateString(),
+    cell: ({ row }) => dateFormatter.toLocaleDate(row.getValue('date')),
   },
   {
     accessorKey: 'description',

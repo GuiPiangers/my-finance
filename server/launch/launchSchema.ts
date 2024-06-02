@@ -15,4 +15,6 @@ export type statusEnum = 'payed' | 'payable'
 
 export type LaunchData = z.infer<typeof LaunchDataSchema> & { id: string }
 
-export type CreateLaunch = Omit<LaunchData, 'id'>
+export type CreateLaunchData = Omit<LaunchData, 'id'>
+export type UpdateLaunchData = Partial<LaunchData> & { id: string }
+export type ChangeLaunchStatusData = { id: string; status: boolean }

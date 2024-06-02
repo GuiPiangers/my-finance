@@ -90,6 +90,10 @@ export default function DataTable<TData, TValue>({
   }, [onChange, rowSelection, table])
 
   useEffect(() => {
+    setRowSelection({})
+  }, [data])
+
+  useEffect(() => {
     if (filters) {
       filters.forEach((filter) => {
         table.getColumn(filter.field as string)?.setFilterValue(filter.value)

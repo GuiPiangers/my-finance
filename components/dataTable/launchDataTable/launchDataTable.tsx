@@ -7,7 +7,7 @@ import { columns } from '@/components/dataTable/launchDataTable/columns'
 import DataTable, { Filter } from '@/components/dataTable/DataTable'
 import ResultCard from '@/components/ResultCard/ResultCard'
 import { Button } from '@/components/ui/button'
-import { MouseEvent, useState } from 'react'
+import { MouseEvent, useCallback, useState } from 'react'
 import {
   Collapsible,
   CollapsibleContent,
@@ -26,16 +26,18 @@ import { moneyFormatter } from '@/utils/moneyFormatter'
 import MoneyNumber from '@/components/moneyNumber/MoneyNumber'
 import { cn } from '@/lib/utils'
 import DateController from '@/components/dateController/DateController'
-import { Row } from '@tanstack/react-table'
+import { Row, Table } from '@tanstack/react-table'
 import LaunchInfoDialog from '@/components/launch/launchInfoDialog/LaunchInfoDialog'
 import { LaunchData } from '@/server/launch/launchSchema'
 
 import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
-import { deleteLaunch, listLaunches } from '@/server/launch/launch'
+import { listLaunches } from '@/server/launch/launch'
 import { useMediaQuery } from '@/hooks/UseMediaQuery'
 import { useQuery } from '@tanstack/react-query'
+import { useDeleteLaunch } from '@/hooks/useDeleteLaunch'
+import UpdateLaunchDialog from '@/components/launch/updateLaunchDialog/updateLaunchDialog'
 
 export function LaunchDataTable({ data }: { data: LaunchData[] }) {
   const { data: launches } = useQuery({
@@ -45,6 +47,8 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
     staleTime: 1000 * 60 * 3, // 3 minutes
   })
 
+  const deleteLaunch = useDeleteLaunch()
+
   const isLargeScreen = useMediaQuery('(min-width: 768px)')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
@@ -52,7 +56,9 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
 
   const [selectedRows, setSelectedRows] = useState<Row<LaunchData>[]>([])
   const [clickedLaunch, setClickedLaunch] = useState<LaunchData>()
-  const [dialogLaunchOpen, setDialogLaunchOpen] = useState(false)
+
+  const [infoLaunchDialogOpen, setInfoLaunchDialogOpen] = useState(false)
+  const [updateLaunchDialogOpen, setUpdateLaunchDialogOpen] = useState(false)
 
   const selectedSum = selectedRows.reduce((acc, row) => {
     return acc + (row.getValue('value') as number)
@@ -64,8 +70,19 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
     { field: 'category', value: category },
     { field: 'status', value: status },
   ]
-
-  if (!launches) return
+  const handleOnDataTableChange = useCallback(
+    (table: Table<LaunchData>) => {
+      setSelectedRows(table.getFilteredSelectedRowModel().rows)
+      if (!isLargeScreen) {
+        table.getColumn('category')?.toggleVisibility(false)
+        table.getColumn('description')?.toggleVisibility(false)
+      } else {
+        table.getColumn('category')?.toggleVisibility(true)
+        table.getColumn('description')?.toggleVisibility(true)
+      }
+    },
+    [isLargeScreen],
+  )
 
   const totalRevenue = launches.reduce((acc, field) => {
     if (field.type === 'revenue' && field.status === 'payed')
@@ -328,7 +345,7 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
               className="border-red-300 text-red-500 hover:bg-red-50"
               onClick={async () => {
                 const deleteRows = selectedRows.map((row) => {
-                  return deleteLaunch({ launchId: row.original.id })
+                  return deleteLaunch.mutateAsync({ launchId: row.original.id })
                 })
                 await Promise.all(deleteRows)
               }}
@@ -351,23 +368,15 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
         </div>
         <LaunchInfoDialog
           data={clickedLaunch!}
-          open={dialogLaunchOpen}
-          onOpenChange={(openValue) => setDialogLaunchOpen(openValue)}
+          open={infoLaunchDialogOpen}
+          onOpenChange={(openValue) => setInfoLaunchDialogOpen(openValue)}
+          onButtonClick={() => setUpdateLaunchDialogOpen(true)}
         >
           <DataTable
             columns={columns}
             data={launches}
             filters={filters}
-            onChange={(table) => {
-              setSelectedRows(table.getFilteredSelectedRowModel().rows)
-              if (!isLargeScreen) {
-                table.getColumn('category')?.toggleVisibility(false)
-                table.getColumn('description')?.toggleVisibility(false)
-              } else {
-                table.getColumn('category')?.toggleVisibility(true)
-                table.getColumn('description')?.toggleVisibility(true)
-              }
-            }}
+            onChange={handleOnDataTableChange}
             onRowClick={(row, event) => {
               if (
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -375,10 +384,20 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
               )
                 return
               setClickedLaunch(row.original)
-              setDialogLaunchOpen(true)
+              setInfoLaunchDialogOpen(true)
             }}
           />
         </LaunchInfoDialog>
+        {clickedLaunch && (
+          <UpdateLaunchDialog
+            initialData={clickedLaunch}
+            open={updateLaunchDialogOpen}
+            onOpenChange={setUpdateLaunchDialogOpen}
+            onSuccess={() => {
+              setUpdateLaunchDialogOpen(false)
+            }}
+          />
+        )}
       </div>
     </>
   )

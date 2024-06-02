@@ -6,27 +6,30 @@ import {
   DialogContent,
   DialogTitle,
   DialogHeader,
+  DialogClose,
 } from '../../ui/dialog'
 import { LaunchData } from '@/server/launch/launchSchema'
 import MoneyNumber from '../../moneyNumber/MoneyNumber'
 import { Switch } from '../../ui/switch'
 import { Label } from '../../ui/label'
-import UpdateLaunchDialog from '../updateLaunchDialog/updateLaunchDialog'
 import { DialogProps } from '@radix-ui/react-dialog'
-import { updateLaunch } from '@/server/launch/launch'
-import { useRouter } from 'next/navigation'
+import { dateFormatter } from '@/utils/Date'
+import { useUpdateLaunch } from '@/hooks/useUpdateLaunch'
+import { Button } from '@/components/ui/button'
 
 type LaunchInfoDialogProps = {
   children: ReactNode
   data: LaunchData
+  onButtonClick?(): void
 } & DialogProps
 
 export default function LaunchInfoDialog({
   children,
   data: launchData,
+  onButtonClick,
   ...dialogProps
 }: LaunchInfoDialogProps) {
-  const router = useRouter()
+  const updateLaunch = useUpdateLaunch()
   return (
     <>
       <Dialog {...dialogProps}>
@@ -48,11 +51,10 @@ export default function LaunchInfoDialog({
               id="swt-status"
               defaultChecked={launchData?.status === 'payed'}
               onCheckedChange={async (value) => {
-                await updateLaunch({
+                updateLaunch.mutate({
                   id: launchData.id!,
                   status: value ? 'payed' : 'payable',
                 })
-                router.refresh()
               }}
             />
             <Label
@@ -76,11 +78,15 @@ export default function LaunchInfoDialog({
           <div className="flex gap-2 justify-between text-sm">
             <span>Data</span>
             {launchData && (
-              <span>{new Date(launchData.date).toLocaleDateString()}</span>
+              <span>{dateFormatter.toLocaleDate(launchData.date)}</span>
             )}
           </div>
-          <div className="flex flex-col">
-            {launchData && <UpdateLaunchDialog initialData={launchData} />}
+          <div className="flex flex-col mt-4">
+            <DialogClose asChild>
+              <Button onClick={onButtonClick} variant={'create'}>
+                Editar
+              </Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
