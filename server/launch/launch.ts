@@ -20,7 +20,7 @@ export const listLaunches = async () => {
     method: 'GET',
     cache: 'no-store',
   })
-
+  console.log('chamou listLaunches')
   return launches
 }
 export const getLaunch = async ({ launchId }: { launchId: string }) => {
