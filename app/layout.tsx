@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import QueryClientContext from '@/contexts/QueryClientProvider'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +20,12 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body className={cn(inter.className, 'bg-slate-50')}>
-        <QueryClientContext>{children}</QueryClientContext>
+        <GoogleOAuthProvider
+          clientId={process.env.CLIENT_ID!}
+          key={process.env.KEY}
+        >
+          <QueryClientContext>{children}</QueryClientContext>
+        </GoogleOAuthProvider>
       </body>
     </html>
   )
