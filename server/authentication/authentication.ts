@@ -1,6 +1,8 @@
 'use server'
 
 import { cookies as nextCookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { api } from '../api/api'
 
 type AuthData = {
   token: string
@@ -10,6 +12,13 @@ type AuthData = {
     email: string
     name: string
   }
+}
+
+type User = {
+  email: string
+  name: string
+  emailVerified: boolean
+  phone?: string
 }
 
 export const loginWithGoogle = async ({ token }: { token: string }) => {
@@ -25,5 +34,18 @@ export const loginWithGoogle = async ({ token }: { token: string }) => {
   const authData = (await response.json()) as AuthData
   cookies.set('myFinance-token', authData.token)
   cookies.set('myFinance-refresh-token', authData.refreshToken)
-  return authData
+  redirect('/')
+}
+
+export const getUser = async () => {
+  const user = await api<User>('/user', {
+    method: 'GET',
+  })
+
+  return user
+}
+export const logout = async () => {
+  await api('/logout', {
+    method: 'post',
+  })
 }

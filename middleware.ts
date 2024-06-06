@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { revalidateToken } from './server/api/api'
+import { usePathname } from 'next/navigation'
 
 export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('myFinance-token')?.value
@@ -13,16 +14,14 @@ export default async function middleware(request: NextRequest) {
   }
   if (!token) {
     const newToken = await revalidateToken({ refreshToken })
-
     if (!newToken) {
       return NextResponse.redirect(signURL)
     }
     response.cookies.set('myFinance-token', newToken, { maxAge: 60 * 15 })
   }
-
   return response
 }
 
 export const config = {
-  matcher: ['/lancamentos'],
+  matcher: '/((?!login|_next/static|_next/image|register|favicon.ico).*)',
 }
