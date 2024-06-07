@@ -1,6 +1,6 @@
 'use server'
 
-import { cookies as nextCookies } from 'next/headers'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { api } from '../api/api'
 
@@ -22,7 +22,6 @@ type User = {
 }
 
 export const loginWithGoogle = async ({ token }: { token: string }) => {
-  const cookies = nextCookies()
   const response = await fetch('http://localhost:3333/login/google', {
     method: 'POST',
     headers: {
@@ -32,8 +31,8 @@ export const loginWithGoogle = async ({ token }: { token: string }) => {
   })
 
   const authData = (await response.json()) as AuthData
-  cookies.set('myFinance-token', authData.token)
-  cookies.set('myFinance-refresh-token', authData.refreshToken)
+  cookies().set('myFinance-token', authData.token)
+  cookies().set('myFinance-refresh-token', authData.refreshToken)
   redirect('/')
 }
 
@@ -46,6 +45,10 @@ export const getUser = async () => {
 }
 export const logout = async () => {
   await api('/logout', {
-    method: 'post',
+    method: 'GET',
   })
+
+  cookies().delete('myFinance-token')
+  cookies().delete('myFinance-refresh-token')
+  redirect('/login')
 }

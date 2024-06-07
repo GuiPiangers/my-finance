@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+
 import { revalidateToken } from './server/api/api'
-import { usePathname } from 'next/navigation'
 
 export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('myFinance-token')?.value
@@ -15,6 +14,7 @@ export default async function middleware(request: NextRequest) {
   if (!token) {
     const newToken = await revalidateToken({ refreshToken })
     if (!newToken) {
+      console.log('token invalido')
       return NextResponse.redirect(signURL)
     }
     response.cookies.set('myFinance-token', newToken, { maxAge: 60 * 15 })
