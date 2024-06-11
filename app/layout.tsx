@@ -4,6 +4,9 @@ import './globals.css'
 import { cn } from '@/lib/utils'
 import QueryClientContext from '@/contexts/QueryClientProvider'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
+import { MantineProvider } from '@mantine/core'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -24,7 +27,9 @@ export default function RootLayout({
           clientId={process.env.CLIENT_ID!}
           key={process.env.KEY}
         >
-          <QueryClientContext>{children}</QueryClientContext>
+          <MantineProvider>
+            <QueryClientContext>{children}</QueryClientContext>
+          </MantineProvider>
         </GoogleOAuthProvider>
       </body>
     </html>
