@@ -25,3 +25,18 @@ class DateFormatter {
 }
 
 export const dateFormatter = new DateFormatter()
+
+export const monthsInPortuguese = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+]

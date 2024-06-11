@@ -2,50 +2,38 @@
 
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { MonthPicker, MonthPickerProps } from '@mantine/dates'
+import { MonthPicker } from '@mantine/dates'
 import 'dayjs/locale/pt-br'
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { Button } from '../ui/button'
+import { monthsInPortuguese } from '@/utils/Date'
 
-const getYearControlProps: MonthPickerProps['getYearControlProps'] = (date) => {
-  if (date.getFullYear() === new Date().getFullYear()) {
-    return {
-      style: {
-        color: 'var(--mantine-color-blue-filled)',
-        fontWeight: 700,
-      },
-    }
-  }
-
-  return {}
+type DateControllerProps = {
+  selectedDate: Date
+  setSelectedDate: Dispatch<SetStateAction<Date>>
 }
 
-const getMonthControlProps: MonthPickerProps['getMonthControlProps'] = (
-  date,
-) => {
-  if (date.getMonth() === new Date().getMonth()) {
-    return {
-      style: {
-        fontWeight: 700,
-        textDecoration: 'underline',
-      },
-    }
-  }
+export default function DateController({
+  selectedDate,
+  setSelectedDate,
+}: DateControllerProps) {
+  const [isOpenMonthPickerModal, setIsOpenMonthPickerModal] = useState(false)
 
-  return {}
-}
-
-export default function DateController() {
-  const [selectedMonth, setSelectedMonth] = useState<Date | null>(new Date())
   return (
     <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow">
       <IoIosArrowBack
         size={20}
         className="p-1 box-content hover:bg-slate-100 rounded cursor-pointer"
       />
-      <Popover>
+      <Popover
+        open={isOpenMonthPickerModal}
+        onOpenChange={setIsOpenMonthPickerModal}
+      >
         <PopoverTrigger>
-          <h2 className="text-lg">Março de 2024</h2>
+          <h2 className="text-lg w-44">
+            {monthsInPortuguese[selectedDate.getMonth()]} de{' '}
+            {selectedDate.getFullYear()}
+          </h2>
         </PopoverTrigger>
         <PopoverContent
           className="w-fit items-center flex flex-col gap-2"
@@ -53,12 +41,19 @@ export default function DateController() {
         >
           <MonthPicker
             locale="pt-br"
-            value={selectedMonth}
-            onChange={setSelectedMonth}
-            getYearControlProps={getYearControlProps}
-            getMonthControlProps={getMonthControlProps}
+            value={selectedDate}
+            onChange={(value) => {
+              setSelectedDate(value || new Date())
+              setIsOpenMonthPickerModal(false)
+            }}
           />
-          <Button variant={'link'} onClick={() => setSelectedMonth(new Date())}>
+          <Button
+            variant={'link'}
+            onClick={() => {
+              setSelectedDate(new Date())
+              setIsOpenMonthPickerModal(false)
+            }}
+          >
             Mês Atual
           </Button>
         </PopoverContent>

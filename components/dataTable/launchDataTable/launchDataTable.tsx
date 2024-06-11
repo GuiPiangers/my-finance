@@ -60,6 +60,8 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
   const [infoLaunchDialogOpen, setInfoLaunchDialogOpen] = useState(false)
   const [updateLaunchDialogOpen, setUpdateLaunchDialogOpen] = useState(false)
 
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+
   const selectedSum = selectedRows.reduce((acc, row) => {
     return acc + (row.getValue('value') as number)
   }, 0)
@@ -156,7 +158,10 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
       </div>
 
       <div className="flex gap-4 items-center">
-        <DateController />
+        <DateController
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
 
         <Popover>
           <PopoverTrigger asChild>
