@@ -13,6 +13,9 @@ export const createLaunch = async (data: CreateLaunchData) => {
     method: 'POST',
     body: JSON.stringify(data),
   })
+
+  console.log(data.date)
+
   return resp
 }
 
@@ -30,8 +33,6 @@ export const listLaunchesByMonthAndYear = async ({
       cache: 'no-store',
     },
   )
-  console.log(month, year)
-
   return launches
 }
 export const getLaunch = async ({ launchId }: { launchId: string }) => {

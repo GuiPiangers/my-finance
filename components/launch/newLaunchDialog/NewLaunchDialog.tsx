@@ -23,14 +23,20 @@ const NewLaunchForm = ({ type, onSuccess }: NewLaunchFormProps) => {
   const createLaunch = useCreateLaunch()
   const searchParams = useSearchParams()
 
+  const actualDate = new Date()
+
   const selectedMonth = searchParams.get('month')
     ? +searchParams.get('month')!
-    : new Date().getMonth()
+    : actualDate.getMonth()
   const selectedYear = searchParams.get('year')
     ? +searchParams.get('year')!
-    : new Date().getFullYear()
+    : actualDate.getFullYear()
 
-  const selectedDate = new Date(selectedYear, selectedMonth)
+  const isActualMonth = selectedMonth === actualDate.getMonth()
+
+  const selectedDate = isActualMonth
+    ? actualDate
+    : new Date(selectedYear, selectedMonth, 1)
 
   useEffect(() => {
     if (onSuccess && createLaunch.isSuccess) onSuccess()

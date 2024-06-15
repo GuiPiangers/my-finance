@@ -17,7 +17,8 @@ export function useCreateLaunch() {
 
   const mutation = useMutation({
     mutationFn: async (data: LaunchData) => {
-      await createLaunch(data)
+      const message = await createLaunch(data)
+      console.log(message)
     },
     onMutate: async (newLaunch) => {
       await queryClient.cancelQueries({
