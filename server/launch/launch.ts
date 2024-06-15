@@ -16,11 +16,21 @@ export const createLaunch = async (data: CreateLaunchData) => {
   return resp
 }
 
-export const listLaunches = async () => {
-  const launches = await api<LaunchData[]>('/launch', {
-    method: 'GET',
-    cache: 'no-store',
-  })
+export const listLaunchesByMonthAndYear = async ({
+  month,
+  year,
+}: {
+  month: number
+  year: number
+}) => {
+  const launches = await api<LaunchData[]>(
+    `/launch?month=${month}&year=${year}`,
+    {
+      method: 'GET',
+      cache: 'no-store',
+    },
+  )
+  console.log(month, year)
 
   return launches
 }

@@ -14,7 +14,7 @@ export default async function LayoutApplication({
   return (
     <div className="grid md:grid-cols-[auto_1fr] grid-cols-1">
       <Header name={user.name} />
-      {children}
+      <div className="overflow-auto">{children}</div>
     </div>
   )
 }

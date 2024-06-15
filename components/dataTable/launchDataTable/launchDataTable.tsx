@@ -33,23 +33,20 @@ import { LaunchData } from '@/server/launch/launchSchema'
 import FilterBadge, {
   FilterBadgeKeys,
 } from '@/components/dataTable/launchDataTable/FilterBadge'
-import { listLaunches } from '@/server/launch/launch'
+import { listLaunchesByMonthAndYear } from '@/server/launch/launch'
 import { useMediaQuery } from '@/hooks/UseMediaQuery'
 import { useQuery } from '@tanstack/react-query'
 import { useDeleteLaunch } from '@/hooks/useDeleteLaunch'
 import UpdateLaunchDialog from '@/components/launch/updateLaunchDialog/updateLaunchDialog'
+import { useSearchParams } from 'next/navigation'
 
 export function LaunchDataTable({ data }: { data: LaunchData[] }) {
-  const { data: launches } = useQuery({
-    queryKey: ['listLaunches'],
-    queryFn: async () => await listLaunches(),
-    initialData: data,
-    staleTime: 1000 * 60 * 3, // 3 minutes
-  })
-
   const deleteLaunch = useDeleteLaunch()
 
   const isLargeScreen = useMediaQuery('(min-width: 768px)')
+
+  const searchParams = useSearchParams()
+
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
   const [category, setCategory] = useState<string[]>([])
@@ -60,7 +57,23 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
   const [infoLaunchDialogOpen, setInfoLaunchDialogOpen] = useState(false)
   const [updateLaunchDialogOpen, setUpdateLaunchDialogOpen] = useState(false)
 
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const selectedMonth = searchParams.get('month')
+    ? +searchParams.get('month')!
+    : new Date().getMonth()
+  const selectedYear = searchParams.get('year')
+    ? +searchParams.get('year')!
+    : new Date().getFullYear()
+
+  const { data: launches } = useQuery({
+    queryKey: ['listLaunches', { month: selectedMonth, year: selectedYear }],
+    queryFn: async () =>
+      await listLaunchesByMonthAndYear({
+        month: selectedMonth,
+        year: selectedYear,
+      }),
+    initialData: data,
+    staleTime: 1000 * 60 * 3, // 3 minutes
+  })
 
   const selectedSum = selectedRows.reduce((acc, row) => {
     return acc + (row.getValue('value') as number)
@@ -158,10 +171,7 @@ export function LaunchDataTable({ data }: { data: LaunchData[] }) {
       </div>
 
       <div className="flex gap-4 items-center">
-        <DateController
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-        />
+        <DateController />
 
         <Popover>
           <PopoverTrigger asChild>

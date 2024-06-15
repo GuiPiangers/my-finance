@@ -9,7 +9,7 @@ export const SidebarContext = createContext<{ expanded?: boolean }>({})
 
 export const SidebarStyle = tv({
   slots: {
-    base: 'shadow-sm max-w-72  w-24 bg-white group h-[calc(100vh-56px)] py-8 px-2  ease-in-out',
+    base: 'shadow-sm max-w-72 w-24 bg-white group h-[calc(100vh-56px)] py-8 px-2  ease-in-out',
     link: 'hover:bg-slate-200 px-2 py-2 rounded-md flex items-center flex-col gap-2',
     text: 'text-[10px]',
     icon: 'h-6 w-6',

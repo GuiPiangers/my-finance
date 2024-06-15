@@ -15,11 +15,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs'
 import { LaunchForm } from '../launchForm/launchForm'
 import { useCreateLaunch } from '@/hooks/useCreateLaunch'
 import { typeEnum } from '@/server/launch/launchSchema'
+import { useSearchParams } from 'next/navigation'
 
 type NewLaunchFormProps = { type: typeEnum; onSuccess?(): void }
 
 const NewLaunchForm = ({ type, onSuccess }: NewLaunchFormProps) => {
   const createLaunch = useCreateLaunch()
+  const searchParams = useSearchParams()
+
+  const selectedMonth = searchParams.get('month')
+    ? +searchParams.get('month')!
+    : new Date().getMonth()
+  const selectedYear = searchParams.get('year')
+    ? +searchParams.get('year')!
+    : new Date().getFullYear()
+
+  const selectedDate = new Date(selectedYear, selectedMonth)
 
   useEffect(() => {
     if (onSuccess && createLaunch.isSuccess) onSuccess()
@@ -30,7 +41,7 @@ const NewLaunchForm = ({ type, onSuccess }: NewLaunchFormProps) => {
       initialLaunchData={{
         type,
         status: 'payable',
-        date: new Date().toISOString().substring(0, 10),
+        date: selectedDate.toISOString().substring(0, 10),
       }}
       onSubmit={async (values) => {
         createLaunch.mutate(values)
@@ -62,7 +73,6 @@ export default function NewLaunchDialog() {
       <DialogTitle className="text-purple-600">Nova transferência</DialogTitle>
     ),
   }
-  console.log(tab)
 
   return (
     <Dialog
